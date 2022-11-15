@@ -22,15 +22,31 @@ const Container = styled.section`
 `;
 
 const BackgroundLogin = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
   img {
-    max-width: 100%;
+    position: relative;
+    opacity: .9;
+    width: 450px;
     object-fit: cover;
   }
+
+  :after {
+      /* content: ''; */
+      position: relative;
+      left: 7rem;
+      width: 3px;
+      height: 20%;
+      background: ${props => props.theme.colors.themeColor};
+      color: white;
+      opacity: .8;
+    }
 `;
 
 const InfoLogin = styled.div`
-  padding: 5rem 8rem;
+  padding: 6rem 8rem;
 `;
 
 const Option = styled.div`
@@ -67,7 +83,7 @@ const Option = styled.div`
 `;
 
 const FormField = styled.div`
-  margin-top: 3rem;
+  margin-top: 5rem;
 `;
 
 const Login = () => {
@@ -87,7 +103,7 @@ const Login = () => {
   return (
     <Container>
       <BackgroundLogin>
-        {/* <img src={backgroundLogin} alt="Background login" /> */}
+        <img src={backgroundLogin} alt="Background login" />
       </BackgroundLogin>
 
       <InfoLogin>

@@ -12,7 +12,7 @@ const GlobalVariables = {
     nbkColor: '#CF16C3',
     interColor: '#ED8519',
     grayBackground: '#EFF2F7',
-    themeColor: '#7431F4'
+    themeColor: '#7431F4',
   },
 }
 
