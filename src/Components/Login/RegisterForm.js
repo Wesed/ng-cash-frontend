@@ -19,8 +19,8 @@ const RegisterForm = () => {
   return (
     <Container>
       <form>
-        <Input type="text" label="Seu username" placeholder="Seu username" {...username} />
-        <Input type="password" label="Senha" placeholder="Senha" {...password}/>
+        <Input type="text" label="Username" placeholder="Username" {...username} />
+        <Input type="password" label="Password" placeholder="Password" {...password}/>
         <Button> Cadastrar </Button>
       </form>
     </Container>

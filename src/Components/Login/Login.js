@@ -67,11 +67,7 @@ const Option = styled.div`
     font-weight: 700;
     cursor: pointer;
     background: transparent;
-
-    :hover {
-      border-bottom: 2px solid ${props=>props.theme.colors.themeColor};
-    }
-
+    
     :target {
       border-bottom: 2px solid ${props=>props.theme.colors.themeColor};
     }
