@@ -10,7 +10,7 @@ const Table = () => {
         value: 'R$ 100,00',
       },
       {
-        date: '01/09/2022',
+        date: '01/11/2022',
         description: 'Transferência',
         type: 'Saída',
         value: 'R$ 150,00',
@@ -28,7 +28,7 @@ const Table = () => {
         value: 'R$ 100,00',
       },
       {
-        date: '01/09/2022',
+        date: '01/11/2022',
         description: 'Transferência',
         type: 'Saída',
         value: 'R$ 150,00',
@@ -72,6 +72,9 @@ const Table = () => {
     prepareRow,
   } = useTable({ columns, data })
 
+  console.log(rows);
+
+  // mudar a cor p/ entrada e saida
   React.useEffect(()=>{
     let table = document.querySelector('#table').rows;
     for (let i = 1; i < table.length; i++) {
@@ -84,6 +87,10 @@ const Table = () => {
     }
   }, []);
 
+  // controle dos filtros
+  React.useEffect(()=> {
+
+  }, []);
 
 
   return (
