@@ -274,8 +274,6 @@ const DataContainer = styled.div`
   }
 
   input[type="date"] {
-        /* opacity: 1;
-        position: absolute; */
         width: calc(100% - 3rem);
         border: 1px solid transparent;
         border-bottom: 1px solid rgba(0, 0, 0, 0.54);
@@ -284,26 +282,10 @@ const DataContainer = styled.div`
   };
 
   input[type="date"]::-webkit-calendar-picker-indicator {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: auto;
-    height: auto;
-    color: transparent;
-    background: transparent;
+  width: 100%;
+  position: absolute;
+  background: transparent;
 }
-
-
-input[type="date"]::-webkit-inner-spin-button {
-    z-index: 1;
-}
-
-
- input[type="date"]::-webkit-clear-button {
-     z-index: 1;
- }
 
   span {
     display: block;
@@ -318,8 +300,13 @@ input[type="date"]::-webkit-inner-spin-button {
 const Dashboard = () => {
 
   const [visible, setVisible] = React.useState(false);
-  const [filterVisible, setFilter] = React.useState(false);
+  const [filterVisible, setFilterVisibility] = React.useState(false);
+  const [filterType, setFilterType] = React.useState('Entrada');
+  const [dateStart, setDateStart] = React.useState('');
+  const [dateEnd, setDateEnd] = React.useState('');
+  const [filterOptions, setFilterOptions] = React.useState('');
 
+  // posiciona o filter container
   React.useEffect(() => {
     const filterContainer = document.querySelector("#filterContainer");
     if (filterVisible) {
@@ -332,6 +319,29 @@ const Dashboard = () => {
       filterContainer.style.bottom = "-18rem";
     }
   }, [filterVisible]);
+
+  //seta as datas do primeiro e ultimo dia do mes atual
+  React.useEffect(() => {
+    var date = new Date();
+
+    var firstDay = new Date(date.getFullYear(), date.getMonth(), 1).toLocaleDateString();
+    var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).toLocaleDateString();
+
+    setDateStart(firstDay.split('/').reverse().join('-'));
+    setDateEnd(lastDay.split('/').reverse().join('-'));
+  }, []);
+
+  const handleClick = () => {
+    if (dateStart < dateEnd) {
+      setFilterOptions({
+        'type': filterType,
+        'start': dateStart.split('-').reverse().join('/'),
+        'end': dateEnd.split('-').reverse().join('/')
+      }); 
+    } else {
+      alert('Ops! A data de início não pode ser maior ou igual a data de término.');
+    }
+  };
 
   return <>
     <Header> 
@@ -367,36 +377,37 @@ const Dashboard = () => {
           <HeaderTable>
             <h3> Transações </h3>
             <h3> Novembro </h3>
-            <FilterIcon onClick={()=>{setFilter(true)}}>
+            <FilterIcon onClick={()=>{setFilterVisibility(true)}}>
               <Filter />
             </FilterIcon>
 
             <FilterContainer id="filterContainer">
-              <button onClick={()=>{setFilter(false)}}> X </button>
+              <button onClick={()=>{setFilterVisibility(false)}}> X </button>
               <h5> Selecione o filtro: </h5>
-              <select name="selectFilter" id="filterSelect">
-                <option value="Entradas"> Entradas </option>
-                <option value="Saidas"> Saidas </option>
+              <select name="selectFilter" id="filterSelect" onChange={(e)=>{setFilterType(e.target.value)}}>
+                <option value="Entrada"> Entradas </option>
+                <option value="Saida"> Saidas </option>
               </select>
 
               <DataContainer>
               <div>
                 <span> De </span>
-                <input type="date" id="start" name="startDate" 
-                value="2022-11-01"/>
+                <input value={dateStart} type="date" id="start" name="startDate" onChange={(e)=>{setDateStart(e.target.value)}}
+                />
               </div>
 
               <div>
                 <span> Até </span>
-                <input type="date" id="end" name="endtDate" value="2022-11-30"/>
+                <input value={dateEnd} type="date" id="end" name="endtDate" onChange={(e)=>{setDateEnd(e.target.value)}}
+                />
               </div>
               </DataContainer>
 
-              <Button> Filtrar </Button>
+              <Button onClick={handleClick}> Filtrar </Button>
 
             </FilterContainer>
           </HeaderTable>
-          <Table />
+          <Table filter={filterOptions} />
         </Transactions>
 
       </InfoMenu>

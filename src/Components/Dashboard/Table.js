@@ -1,7 +1,8 @@
 import React from 'react';
 import { useTable } from 'react-table'
 
-const Table = () => {
+const Table = ({filter}) => {
+
   const data = React.useMemo( () => [
       {
         date: '15/11/2022',
@@ -10,9 +11,9 @@ const Table = () => {
         value: 'R$ 100,00',
       },
       {
-        date: '01/11/2022',
+        date: '02/11/2022',
         description: 'Transferência',
-        type: 'Saída',
+        type: 'Saida',
         value: 'R$ 150,00',
       },
       {
@@ -28,9 +29,9 @@ const Table = () => {
         value: 'R$ 100,00',
       },
       {
-        date: '01/11/2022',
+        date: '17/11/2022',
         description: 'Transferência',
-        type: 'Saída',
+        type: 'Saida',
         value: 'R$ 150,00',
       },
       {
@@ -72,8 +73,6 @@ const Table = () => {
     prepareRow,
   } = useTable({ columns, data })
 
-  console.log(rows);
-
   // mudar a cor p/ entrada e saida
   React.useEffect(()=>{
     let table = document.querySelector('#table').rows;
@@ -89,8 +88,32 @@ const Table = () => {
 
   // controle dos filtros
   React.useEffect(()=> {
+    if (filter) {
+      let table = document.querySelector('#table').rows;
 
-  }, []);
+      for (let i = 1; i < table.length; i++) {      
+          if (!(table[i].children[0].innerText >= filter.start && table[i].children[0].innerText <= filter.end)) {
+                table[i].style.display = 'none';
+            }
+        else {
+          table[i].style.display = '';
+        }   
+      }
+
+      /* primeiro filtra pela data, depois filtra os valores que sobraram novamente */
+
+      for (let i = 1; i < table.length; i++) {     
+        if (table[i].style.display === '') {
+          if (table[i].children[2].innerText !== filter.type ) {
+            table[i].style.display = 'none';
+          } else {
+            table[i].style.display = '';
+          }
+        }
+    }
+
+    }
+  }, [filter]);
 
 
   return (
