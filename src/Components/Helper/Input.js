@@ -55,6 +55,7 @@ const Error = styled.p`
 
 export const Input = ({type, name, label, placeholder, value, onChange, onBlur, error}) => {
 
+
   return (
     <InputField>
       <label> {label} </label>
@@ -64,6 +65,7 @@ export const Input = ({type, name, label, placeholder, value, onChange, onBlur, 
         value={value} 
         onChange={onChange}
         onBlur={onBlur}
+        minLength={3}
         >
       </input>
 

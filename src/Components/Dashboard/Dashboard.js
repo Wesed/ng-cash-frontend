@@ -6,8 +6,11 @@ import {ReactComponent as Filter} from "../../Assets/filter.svg";
 import {ReactComponent as Dollar} from "../../Assets/dollar.svg";
 import {ReactComponent as Eye} from "../../Assets/eye.svg";
 import {ReactComponent as EyeOff} from "../../Assets/eye-off.svg";
+import {ReactComponent as TransactionIcon} from "../../Assets/transaction.svg";
 import Table from './Table';
 import Button from './../Helper/Button';
+import { UserContext } from './../../UserContext';
+import { FIND_ACCOUNT } from './../../api';
 
 const Header = styled.div`
   background: #111;
@@ -57,7 +60,7 @@ const Container = styled.section`
   height: 100%;
   background: ${props => props.theme.colors.background};
   display: grid;
-  grid-template-columns: 15% 85%;
+  grid-template-columns: 1fr;
 
   h1 {
     /* font-size: 1.25rem; */
@@ -65,17 +68,35 @@ const Container = styled.section`
   }
 `;
 
-const MenuSidebar = styled.div`
-  background: white;
-  height: 100%;
-`;
 
 const InfoMenu = styled.div`
-  padding: 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  padding: 0 2rem 0 5rem;
 
   h1 {
+    position: relative;
+    top: 2rem;
     font-weight: 500;
   }
+`;
+
+const Transaction = styled.div`
+    position: relative;
+    align-self: end;
+    display: flex;
+    align-items: center;
+    top: 4.5rem;
+    right: .5rem;
+    color: white;
+
+    button {
+      border-radius: 50% / 5em;
+      box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%);
+      span {
+        font-size: 1.5rem;
+      }
+    }
 `;
 
 const Balance = styled.div`
@@ -139,7 +160,7 @@ const Balance = styled.div`
   }
 `;
 
-const Transactions = styled.div`
+const TableTransactions = styled.div`
   max-height: 100%;
   background: white;
   border-radius: 10px;
@@ -305,13 +326,14 @@ const Dashboard = () => {
   const [dateStart, setDateStart] = React.useState('');
   const [dateEnd, setDateEnd] = React.useState('');
   const [filterOptions, setFilterOptions] = React.useState('');
+  const {login, data, dataAcc, setDataAcc, token} = React.useContext(UserContext);
 
   // posiciona o filter container
   React.useEffect(() => {
     const filterContainer = document.querySelector("#filterContainer");
     if (filterVisible) {
       filterContainer.style.opacity = "1";
-      filterContainer.style.right = "7rem";
+      filterContainer.style.right = "14rem";
       filterContainer.style.bottom = "1rem";
     } else {
       filterContainer.style.opacity = "0";
@@ -343,6 +365,22 @@ const Dashboard = () => {
     }
   };
 
+  //recebe os dados da conta
+  // React.useEffect(() => {
+  //   console.log(data);
+  //   const getAccount = async () => {
+  //     const { url, options } = FIND_ACCOUNT({
+  //       id: data.accountId,
+  //       token: token
+  //     });
+  //     const response = await fetch(url, options);
+  //     const json = await response.json();
+  //     setDataAcc(json);
+  //     console.log('bb', json);
+  //   };
+  //   getAccount();
+  // }, [data.accountId, token, setDataAcc, data]);
+
   return <>
     <Header> 
       <Logo />
@@ -353,12 +391,20 @@ const Dashboard = () => {
     </Header>
 
     <Container>
-      <MenuSidebar>
-        {/* <HeaderSidebar></HeaderSidebar> */}
-      </MenuSidebar>
+      {/* <MenuSidebar>
+        <HeaderSidebar></HeaderSidebar>
+      </MenuSidebar> */}
 
       <InfoMenu>
-        <h1> Olá, @Wesed!</h1>
+        <h1> Olá, @{data.username}!</h1>
+
+        <Transaction>
+          {/* <TransactionIcon/> */}
+          <Button className="transaction-button">
+            <span> + </span>
+            Transferência
+          </Button>
+        </Transaction>
 
         <Balance>
           <div>
@@ -368,12 +414,12 @@ const Dashboard = () => {
                 {visible ? <Eye/> : <EyeOff/>}
               </button>
             </div>
-            {visible ? <h3> R$ 100,00</h3> : <h3> *********</h3>}
+            {visible ? <h3> R${dataAcc.balance}</h3> : <h3> *********</h3>}
           </div>
           <Dollar />
         </Balance>
 
-        <Transactions>
+        <TableTransactions>
           <HeaderTable>
             <h3> Transações </h3>
             <h3> Novembro </h3>
@@ -408,7 +454,7 @@ const Dashboard = () => {
             </FilterContainer>
           </HeaderTable>
           <Table filter={filterOptions} />
-        </Transactions>
+        </TableTransactions>
 
       </InfoMenu>
 
