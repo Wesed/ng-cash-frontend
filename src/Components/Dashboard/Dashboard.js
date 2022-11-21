@@ -6,11 +6,12 @@ import {ReactComponent as Filter} from "../../Assets/filter.svg";
 import {ReactComponent as Dollar} from "../../Assets/dollar.svg";
 import {ReactComponent as Eye} from "../../Assets/eye.svg";
 import {ReactComponent as EyeOff} from "../../Assets/eye-off.svg";
-import {ReactComponent as TransactionIcon} from "../../Assets/transaction.svg";
 import Table from './Table';
 import Button from './../Helper/Button';
 import { UserContext } from './../../UserContext';
-import { FIND_ACCOUNT } from './../../api';
+import { Input } from './../Helper/Input';
+import useForm from './../../Hooks/UseForm';
+import ButtonClose from './../Helper/ButtonClose';
 
 const Header = styled.div`
   background: #111;
@@ -36,19 +37,22 @@ const Header = styled.div`
       transition: .3s;
     }
 
-    a {
-      text-decoration: none;
+    button {
+      border: 1px solid transparent;
+      background: transparent;
       color: white;
       transition: .3s;
     }
 
     :hover {
-      a {
+      button {
         color: ${props => props.theme.colors.themeColor};
+        pointer-events: none;
       }
 
       svg {
         fill: ${props => props.theme.colors.themeColor};
+        pointer-events: none;
       }
     }
   }
@@ -68,7 +72,6 @@ const Container = styled.section`
   }
 `;
 
-
 const InfoMenu = styled.div`
   display: flex;
   flex-direction: column;
@@ -81,7 +84,7 @@ const InfoMenu = styled.div`
   }
 `;
 
-const Transaction = styled.div`
+const TransactionButton = styled.div`
     position: relative;
     align-self: end;
     display: flex;
@@ -97,6 +100,59 @@ const Transaction = styled.div`
         font-size: 1.5rem;
       }
     }
+`;
+
+const Transaction = styled.div`
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  top: 0; right: 0; bottom: 0; left: 0;
+  width: 100vw;
+  height: 100%;
+`;
+const TransactionContainer = styled.div`
+  position: relative;
+  z-index: 999;
+  background: white;
+  width: 500px;
+  /* height: 300px; */
+  border-radius: 10px;
+  box-shadow: 2px 0 15px 5px rgba(0, 0, 0, .2);
+  padding: 2rem;
+
+  h2 {
+    color: rgba(0, 0, 0, .87);
+    font-weight: 500;
+    margin-top: -1rem;
+  }
+
+  input:first-of-type {
+    border-bottom: 2px solid ${props=>props.theme.colors.darkGray}; 
+    color: rgba(0, 0, 0, .87);
+    font-size: 1.5rem;
+
+    :hover,
+    :focus {
+      border-bottom: 2px solid black;
+      outline: none;
+    }
+  }
+
+  .transferUser {
+    font-size: 1rem !important;
+  }
+
+`;
+
+const TransactionBackground = styled.div`
+  position: fixed;
+  z-index: 998;
+  top: 0; right: 0; bottom: 0; left: 0;
+  width: 100vw;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
 `;
 
 const Balance = styled.div`
@@ -239,25 +295,6 @@ const FilterContainer = styled.div`
     left: -1rem;
   }
 
-  button:nth-child(1) {
-    position: absolute;
-    right: 0;
-    top: 0rem;
-    cursor: pointer;
-    border: 1px solid transparent;
-    background: ${props => props.theme.colors.themeColor};
-    border-radius: 0 10px 0 50px;
-    padding: .5rem .8rem .5rem 1rem;
-    font-size: 1rem;
-    font-weight: 700;
-    color: white;
-    opacity: .4;
-
-    :hover {
-      opacity: .8;
-    }
-  }
-
   button:last-child {
     width: 80%;
     padding: .8rem;
@@ -319,14 +356,17 @@ const DataContainer = styled.div`
 `;
 
 const Dashboard = () => {
-
+  const valueTransfer = useForm(true);
+  const userDebit = useForm(true);
+  const userCredit = useForm(true);
+  
   const [visible, setVisible] = React.useState(false);
   const [filterVisible, setFilterVisibility] = React.useState(false);
   const [filterType, setFilterType] = React.useState('Entrada');
   const [dateStart, setDateStart] = React.useState('');
   const [dateEnd, setDateEnd] = React.useState('');
   const [filterOptions, setFilterOptions] = React.useState('');
-  const {login, data, dataAcc, setDataAcc, token} = React.useContext(UserContext);
+  const {data, dataAcc, userLogout} = React.useContext(UserContext);
 
   // posiciona o filter container
   React.useEffect(() => {
@@ -365,45 +405,40 @@ const Dashboard = () => {
     }
   };
 
-  //recebe os dados da conta
-  // React.useEffect(() => {
-  //   console.log(data);
-  //   const getAccount = async () => {
-  //     const { url, options } = FIND_ACCOUNT({
-  //       id: data.accountId,
-  //       token: token
-  //     });
-  //     const response = await fetch(url, options);
-  //     const json = await response.json();
-  //     setDataAcc(json);
-  //     console.log('bb', json);
-  //   };
-  //   getAccount();
-  // }, [data.accountId, token, setDataAcc, data]);
-
   return <>
     <Header> 
       <Logo />
-      <div>
+      <div onClick={userLogout}>
         <Logout /> 
-        <a href="/login"> Logout </a>
+        <button> Logout </button>
       </div>
     </Header>
 
     <Container>
-      {/* <MenuSidebar>
-        <HeaderSidebar></HeaderSidebar>
-      </MenuSidebar> */}
 
       <InfoMenu>
         <h1> Olá, @{data.username}!</h1>
 
-        <Transaction>
+        <TransactionButton>
           {/* <TransactionIcon/> */}
           <Button className="transaction-button">
             <span> + </span>
             Transferência
           </Button>
+        </TransactionButton>
+
+        <Transaction>
+          <TransactionContainer>
+            <ButtonClose onClick={()=>{setFilterVisibility(false)}}> X </ButtonClose>
+            <h2> Nova transferência </h2>
+            <Input value={valueTransfer} placeholder="R$" {...valueTransfer}/>
+            <div>
+              <Input value={userDebit} className="transferUser" placeholder="Informe seu usuario" {...userDebit} />
+              <Input value={userCredit} className="transferUser" placeholder="Username de origem (quem vai receber)" {...userCredit}/>
+            </div>
+            <Button> Transferir </Button>
+          </TransactionContainer>
+        <TransactionBackground />
         </Transaction>
 
         <Balance>
@@ -428,7 +463,7 @@ const Dashboard = () => {
             </FilterIcon>
 
             <FilterContainer id="filterContainer">
-              <button onClick={()=>{setFilterVisibility(false)}}> X </button>
+              <ButtonClose onClick={()=>{setFilterVisibility(false)}}> X </ButtonClose>
               <h5> Selecione o filtro: </h5>
               <select name="selectFilter" id="filterSelect" onChange={(e)=>{setFilterType(e.target.value)}}>
                 <option value="Entrada"> Entradas </option>

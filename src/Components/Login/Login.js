@@ -6,7 +6,7 @@ import ForgotForm from './ForgotForm';
 import { Route } from 'react-router-dom';
 import styled from "styled-components";
 import backgroundLogin from "../../Assets/background.svg";
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Container = styled.section`
   background: #111;

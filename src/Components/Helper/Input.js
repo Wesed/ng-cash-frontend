@@ -53,7 +53,7 @@ const Error = styled.p`
 `;
 
 
-export const Input = ({type, name, label, placeholder, value, onChange, onBlur, error}) => {
+export const Input = ({type, name, label, placeholder, value, onChange, onBlur, error, className}) => {
 
 
   return (
@@ -66,6 +66,7 @@ export const Input = ({type, name, label, placeholder, value, onChange, onBlur, 
         onChange={onChange}
         onBlur={onBlur}
         minLength={3}
+        className={className}
         >
       </input>
 
