@@ -25,3 +25,13 @@ export const getAccount = async (request: Request, response: Response) => {
     });
     return response.json(account);
 };
+
+export const deleteAccount = async (request: Request, response: Response) => {
+    console.log('aqui', request);
+    const account = await AppDataSource.getRepository(Account).createQueryBuilder('account') 
+    .delete()
+    .from(Account)
+    .where("id = :id", { id: request.body.id })
+    .execute()
+    return response.json(account);
+};

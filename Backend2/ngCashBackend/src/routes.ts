@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { getUser, saveUser, getUserTransaction } from './controller/UserController';
-import { saveAccount, getAccount } from './controller/AccountController';
+import { saveAccount, getAccount, deleteAccount } from './controller/AccountController';
 import authMiddleware from './middleware/AuthMiddleware';
 import { getLogin } from './controller/AuthController';
 import { getTransactions, newTransaction } from './controller/TransactionController';
@@ -18,6 +18,7 @@ routes.post('/login', getLogin);
 routes.post('/account', saveAccount);
 routes.post('/findAccount', authMiddleware, getAccount);
 routes.post('/findAccountTransaction', authMiddleware, getUserTransaction);
+routes.post('/deleteAccount', deleteAccount);
 
 
 routes.post('/transaction', authMiddleware, newTransaction);

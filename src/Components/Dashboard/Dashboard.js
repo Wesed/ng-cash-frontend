@@ -416,7 +416,6 @@ const Dashboard = () => {
         console.log(userCredit.value, data.username);
         newTransfer(valueTransfer.value, userCredit.value);
         setError('');
-        setTransferVisibility(false);
       } else {
         setError('Você não pode fazer uma transferência pra si mesmo.');
       }
