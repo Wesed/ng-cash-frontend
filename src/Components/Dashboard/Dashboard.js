@@ -12,6 +12,7 @@ import { UserContext } from './../../UserContext';
 import { Input } from './../Helper/Input';
 import useForm from './../../Hooks/UseForm';
 import ButtonClose from './../Helper/ButtonClose';
+import Error from './../Helper/Error';
 
 const Header = styled.div`
   background: #111;
@@ -62,7 +63,7 @@ const Container = styled.section`
   position: relative;
   width: 100%;
   height: 100%;
-  background: ${props => props.theme.colors.background};
+  background: ${props => props.theme.colors.grayBackground};
   display: grid;
   grid-template-columns: 1fr;
 
@@ -75,7 +76,7 @@ const Container = styled.section`
 const InfoMenu = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 0 2rem 0 5rem;
+  padding: 0 5rem 0 5rem;
 
   h1 {
     position: relative;
@@ -143,6 +144,7 @@ const TransactionContainer = styled.div`
   .transferUser {
     font-size: 1rem !important;
   }
+
 
 `;
 
@@ -222,9 +224,6 @@ const TableTransactions = styled.div`
   border-radius: 10px;
   box-shadow: 0 5px 5px 1px rgba(1, 1, 1, 0.1);
 
-  table {
-    width: 100%;
-  }
 `;
 
 const HeaderTable = styled.div`
@@ -357,16 +356,17 @@ const DataContainer = styled.div`
 
 const Dashboard = () => {
   const valueTransfer = useForm(true);
-  const userDebit = useForm(true);
   const userCredit = useForm(true);
-  
+
   const [visible, setVisible] = React.useState(false);
   const [filterVisible, setFilterVisibility] = React.useState(false);
+  const [transferVisible, setTransferVisibility] = React.useState(false);
   const [filterType, setFilterType] = React.useState('Entrada');
   const [dateStart, setDateStart] = React.useState('');
   const [dateEnd, setDateEnd] = React.useState('');
   const [filterOptions, setFilterOptions] = React.useState('');
-  const {data, dataAcc, userLogout} = React.useContext(UserContext);
+  const {data, dataAcc, error, userLogout, setError, newTransfer} = React.useContext(UserContext);
+
 
   // posiciona o filter container
   React.useEffect(() => {
@@ -396,13 +396,37 @@ const Dashboard = () => {
   const handleClick = () => {
     if (dateStart < dateEnd) {
       setFilterOptions({
-        'type': filterType,
-        'start': dateStart.split('-').reverse().join('/'),
-        'end': dateEnd.split('-').reverse().join('/')
+        type: filterType,
+        start: dateStart.split('-').reverse().join('/'),
+        end: dateEnd.split('-').reverse().join('/')
       }); 
     } else {
       alert('Ops! A data de início não pode ser maior ou igual a data de término.');
     }
+  };
+
+  const handleTransfer = () => {
+    // validar valor > 1 e < que o saldo atual 
+    // verificar se o nome do favorito nao e o mesmo do usuario
+    const transferValue = +parseFloat(valueTransfer.value.replace(',', '.')).toFixed(2);
+    const balanceValue = +parseFloat(dataAcc.balance).toFixed(2);
+
+    if (transferValue>0 && transferValue <= balanceValue) {
+      if(userCredit.value !== data.username) {
+        console.log(userCredit.value, data.username);
+        newTransfer(valueTransfer.value, userCredit.value);
+        setError('');
+        setTransferVisibility(false);
+      } else {
+        setError('Você não pode fazer uma transferência pra si mesmo.');
+      }
+    } else if(transferValue<=0 ) {
+      setError('Ops, o saldo precisa ser maior que 1.');
+    } 
+      else {
+        setError('Ops, seu saldo é menor que o valor da transação.');
+      }
+
   };
 
   return <>
@@ -421,25 +445,28 @@ const Dashboard = () => {
 
         <TransactionButton>
           {/* <TransactionIcon/> */}
-          <Button className="transaction-button">
+          <Button className="transaction-button" onClick={()=>{setTransferVisibility(true)}}>
             <span> + </span>
             Transferência
           </Button>
         </TransactionButton>
 
-        <Transaction>
-          <TransactionContainer>
-            <ButtonClose onClick={()=>{setFilterVisibility(false)}}> X </ButtonClose>
-            <h2> Nova transferência </h2>
-            <Input value={valueTransfer} placeholder="R$" {...valueTransfer}/>
-            <div>
-              <Input value={userDebit} className="transferUser" placeholder="Informe seu usuario" {...userDebit} />
-              <Input value={userCredit} className="transferUser" placeholder="Username de origem (quem vai receber)" {...userCredit}/>
-            </div>
-            <Button> Transferir </Button>
-          </TransactionContainer>
-        <TransactionBackground />
+        {
+          transferVisible &&
+          <Transaction>
+            <TransactionContainer>
+              <ButtonClose onClick={()=>{setTransferVisibility(false)}}> X </ButtonClose>
+              <h2> Nova transferência </h2>
+              <Input value={valueTransfer} placeholder="R$" {...valueTransfer}/>
+              <div>
+                <Input value={userCredit} className="transferUser" placeholder="Username de origem (quem vai receber)" {...userCredit}/>
+              </div>
+              {error && <Error error={error} />}
+              <Button onClick={handleTransfer}> Transferir </Button>
+            </TransactionContainer>
+          <TransactionBackground />
         </Transaction>
+        }
 
         <Balance>
           <div>
