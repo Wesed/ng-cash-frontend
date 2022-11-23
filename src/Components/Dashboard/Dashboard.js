@@ -6,6 +6,7 @@ import {ReactComponent as Filter} from "../../Assets/filter.svg";
 import {ReactComponent as Dollar} from "../../Assets/dollar.svg";
 import {ReactComponent as Eye} from "../../Assets/eye.svg";
 import {ReactComponent as EyeOff} from "../../Assets/eye-off.svg";
+import {ReactComponent as TransactionIcon} from "../../Assets/transaction.svg";
 import Table from './Table';
 import Button from './../Helper/Button';
 import { UserContext } from './../../UserContext';
@@ -13,6 +14,7 @@ import { Input } from './../Helper/Input';
 import useForm from './../../Hooks/UseForm';
 import ButtonClose from './../Helper/ButtonClose';
 import Error from './../Helper/Error';
+import UseMedia from './../../Hooks/UseMedia';
 
 const Header = styled.div`
   background: #111;
@@ -57,6 +59,11 @@ const Header = styled.div`
       }
     }
   }
+
+  @media (max-width: 30rem) {
+    padding: .5rem 0;
+    justify-content: space-around;
+  }
 `;
 
 const Container = styled.section`
@@ -83,6 +90,11 @@ const InfoMenu = styled.div`
     top: 2rem;
     font-weight: 500;
   }
+
+  @media (max-width: 30rem) {
+    width: 90%;
+    padding: 0 1rem 2rem 1rem;
+  }
 `;
 
 const TransactionButton = styled.div`
@@ -94,11 +106,29 @@ const TransactionButton = styled.div`
     right: .5rem;
     color: white;
 
+    p {
+      display: inline;
+    }
+
     button {
       border-radius: 50% / 5em;
       box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%);
       span {
         font-size: 1.5rem;
+      }
+    }
+
+    @media (max-width: 30rem) {
+      top: -2rem;
+
+      svg {
+        path {
+          stroke: white;
+        }
+      }
+
+      button {
+        border-radius: 50%;
       }
     }
 `;
@@ -113,6 +143,7 @@ const Transaction = styled.div`
   width: 100vw;
   height: 100%;
 `;
+
 const TransactionContainer = styled.div`
   position: relative;
   z-index: 999;
@@ -145,6 +176,9 @@ const TransactionContainer = styled.div`
     font-size: 1rem !important;
   }
 
+  @media (max-width: 30rem) {
+    width: 70%;
+  }
 
 `;
 
@@ -223,7 +257,7 @@ const TableTransactions = styled.div`
   background: white;
   border-radius: 10px;
   box-shadow: 0 5px 5px 1px rgba(1, 1, 1, 0.1);
-
+  margin: 0 -1rem 0 0;
 `;
 
 const HeaderTable = styled.div`
@@ -241,6 +275,11 @@ const HeaderTable = styled.div`
       color: ${props => props.theme.colors.themeColor};
       font-weight: 700;
     }
+  }
+
+  @media (max-width: 30rem) {
+    justify-content: space-around;
+    padding: 1rem 0;
   }
 `;
 
@@ -285,7 +324,7 @@ const FilterContainer = styled.div`
   width: 250px;
   right: 0;
   bottom: -7rem;
-  opacity: 0;
+  opacity: 1;
   transition: .3s;
 
   h5 {
@@ -357,6 +396,7 @@ const DataContainer = styled.div`
 const Dashboard = () => {
   const valueTransfer = useForm(true);
   const userCredit = useForm(true);
+  const media = UseMedia('(max-width: 30rem)');
 
   const [visible, setVisible] = React.useState(false);
   const [filterVisible, setFilterVisibility] = React.useState(false);
@@ -365,21 +405,22 @@ const Dashboard = () => {
   const [dateStart, setDateStart] = React.useState('');
   const [dateEnd, setDateEnd] = React.useState('');
   const [filterOptions, setFilterOptions] = React.useState('');
-  const {data, error, userLogout, setError, newTransfer, dataAcc} = React.useContext(UserContext);
+  const {data, error, userLogout, setError, newTransfer} = React.useContext(UserContext);
 
   // posiciona o filter container
   React.useEffect(() => {
     const filterContainer = document.querySelector("#filterContainer");
     if (filterVisible) {
       filterContainer.style.opacity = "1";
-      filterContainer.style.right = "14rem";
+      filterContainer.style.right = `${media ? "4rem" : "14rem"}`;
       filterContainer.style.bottom = "1rem";
     } else {
       filterContainer.style.opacity = "0";
       filterContainer.style.right = "0";
       filterContainer.style.bottom = "-18rem";
     }
-  }, [filterVisible]);
+
+  }, [filterVisible, media]);
 
   //seta as datas do primeiro e ultimo dia do mes atual
   React.useEffect(() => {
@@ -405,8 +446,7 @@ const Dashboard = () => {
   };
 
   const handleTransfer = () => {
-    setVisible(true);
-
+    
     const transferValue = +parseFloat(valueTransfer.value.replace(',', '.')).toFixed(2);
     // const balanceValue = +parseFloat(dataAcc.balance).toFixed(2);
     let balanceValue = 0;
@@ -446,10 +486,13 @@ const Dashboard = () => {
         <h1> Olá, @{data.username}!</h1>
 
         <TransactionButton>
-          {/* <TransactionIcon/> */}
           <Button className="transaction-button" onClick={()=>{setTransferVisibility(true)}}>
-            <span> + </span>
-            Transferência
+            {
+              media ?
+              <TransactionIcon />
+              :
+              <p> <span> + </span> Transferência </p>
+            }
           </Button>
         </TransactionButton>
 
@@ -464,7 +507,7 @@ const Dashboard = () => {
                 <Input value={userCredit} className="transferUser" placeholder="Username de origem (quem vai receber)" {...userCredit}/>
               </div>
               {error && <Error error={error} />}
-              <Button onClick={handleTransfer}> Transferir </Button>
+              <Button onMouseDown={()=>{setVisible(true)}} onClick={handleTransfer}> Transferir </Button>
             </TransactionContainer>
           <TransactionBackground />
         </Transaction>

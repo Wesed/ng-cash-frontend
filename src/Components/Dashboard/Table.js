@@ -66,7 +66,6 @@ const Table = ({visible, filter}) => {
           value: dataTable.transactions[i].valueTransaction    
         })
     }
-    // let json = JSON.stringify(dataItems);
     setDataItems(dataItems);
   } 
   }, [dataTable, data]);
@@ -157,7 +156,7 @@ const Table = ({visible, filter}) => {
           </tr>
         </thead>
         <tbody>
-          {dataItems?.map((item, index) => 
+          {dataItems?.slice(0).reverse().map((item, index) => 
             <tr key={index}>
               <td> {item.date} </td>
               <td> {item.description} </td>

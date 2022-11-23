@@ -16,8 +16,9 @@ const Container = styled.section`
   grid-template-columns: repeat(2, 50%);
 
   @media (max-width: 30rem) {
-    margin: 2rem auto;
-    max-width: 100%;
+    grid-template-columns: 1fr;
+    max-height: 100%;
+    overflow: hidden;
   }
 `;
 
@@ -33,20 +34,33 @@ const BackgroundLogin = styled.div`
     object-fit: cover;
   }
 
-  :after {
-      /* content: ''; */
-      position: relative;
-      left: 7rem;
-      width: 3px;
-      height: 20%;
-      background: ${props => props.theme.colors.themeColor};
-      color: white;
-      opacity: .8;
+    @media (max-width: 30rem) {
+      justify-content: center;
+      align-items: stretch;
+      max-width: 100%;
+      padding: 3rem;
+      /* grid-row: 2; */
+      
+      img {
+        padding: 1rem;
+        max-width: 100%;
+        /* width: 300px;
+        height: 300px; */
+      }
     }
 `;
 
 const InfoLogin = styled.div`
   padding: 6rem 8rem;
+  height: 100%;
+
+  @media (max-width: 30rem) {
+    max-width: 80%;
+    max-height: 100%;
+    padding: 0;
+    margin: 2rem;
+  }
+
 `;
 
 const Option = styled.div`
@@ -80,6 +94,12 @@ const Option = styled.div`
 
 const FormField = styled.div`
   margin-top: 5rem;
+
+  @media (max-width: 30rem) {
+    margin-top: 3rem;
+    maz-width: 100%;
+  }
+  
 `;
 
 const Login = () => {

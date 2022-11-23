@@ -1,0 +1,32 @@
+create table Users (
+	id serial primary key,
+	username varchar(50) not null unique,
+	password varchar(100) not null,
+	AccountID integer,
+	foreign key (AccountID) references Accounts (id)
+)
+
+drop table Users; 
+
+create table Accounts (
+	id serial primary key,
+	balance numeric(10, 2)
+)
+
+create table Transactions (
+	id serial primary key,
+	createdAt DATE,
+	descricao varchar(50),
+	tipo varchar(20),
+	valor numeric(10, 2),
+	debitedAccountID integer not null,
+	creditedAccountID integer not null,
+	foreign key (debitedAccountID) references Accounts (id),
+	foreign key (creditedAccountID) references Accounts (id)
+)
+
+
+INSERT INTO Users (username, password) values ('@joao', '1234');
+INSERT INTO Users (username, password) values ('@jose', '5678');
+
+SELECT * FROM Users;
