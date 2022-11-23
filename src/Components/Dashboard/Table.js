@@ -28,10 +28,19 @@ const TableContainer = styled.table`
   }
 `;
 
-const Table = ({filter}) => {
-  const {getTransactions, data } = React.useContext(UserContext);
+const Empty = styled.p`
+  text-align: center;
+  font-weight: 700;
+  font-size: 1rem;
+  color: rgba(0, 0, 0, .54);
+  padding: 1rem;
+`;
+
+const Table = ({visible, filter}) => {
+  const {getTransactions, data, dataAcc, setDataAcc } = React.useContext(UserContext);
   const [dataTable, setData] = React.useState('')
   const [dataItems, setDataItems] = React.useState([]);
+  const [isEmpty, setEmpty] = React.useState(true);
 
   React.useEffect(()=>{
 
@@ -43,6 +52,7 @@ const Table = ({filter}) => {
 
   }, [getTransactions]);
 
+  // seta os dados do banco no state dataItems
   React.useEffect(()=>{
     if (dataTable) {
       let dataItems = [];
@@ -57,14 +67,19 @@ const Table = ({filter}) => {
     }
     // let json = JSON.stringify(dataItems);
     setDataItems(dataItems);
-  }
+  } 
   }, [dataTable, data]);
 
 
   // mudar a cor p/ entrada e saida
   React.useEffect(() => {
     if (dataTable) {
+      dataTable.length > 0 && setEmpty(false);
       let table = document.querySelector("#table").rows;
+      if(table.length === 1 ) {
+        let tableContainer = document.querySelector("#table");
+
+      }
       for (let i = 1; i < table.length; i++) {
         // console.log(table[i].children[2].innerText);
         if (table[i].children[2].innerText === "Entrada") {
@@ -109,9 +124,29 @@ const Table = ({filter}) => {
     }
   }, [filter]);
 
+  // seta os debitos e creditos nos estados, afim de saber o balance atual
+  React.useEffect(()=>{
+    if (dataItems) {
+      let credit = parseFloat(dataAcc.balance);
+      let debit = 0;
+      for (let i = 0; i < dataItems.length; i++) {
+        if (dataItems[i].type === 'Entrada') {
+          credit +=  +parseFloat(dataItems[i].value);
+        } else {
+          debit = debit + +parseFloat(dataItems[i].value);
+        }
+      }
+      let balance = +parseFloat(credit - debit).toFixed(2);
+      console.log(credit);
+      if (visible) document.querySelector('#balance').innerHTML = `R$${balance}`;
+    }
+
+
+  }, [dataItems, dataAcc, visible]);
+
 
   if (dataTable)
-  return (
+  return <>
       <TableContainer id="table">
         <thead className="header">
           <tr>
@@ -122,17 +157,22 @@ const Table = ({filter}) => {
           </tr>
         </thead>
         <tbody>
-          {dataItems?.map((item, index) => (
+          {dataItems?.map((item, index) => 
             <tr key={index}>
               <td> {item.date} </td>
               <td> {item.description} </td>
               <td> {item.type} </td>
               <td> R$ {item.value} </td>
             </tr>
-          ))}
+          )}
+
         </tbody>  
       </TableContainer>
-    )
+
+      {isEmpty &&
+        <Empty> Ops, ainda não possui nenhuma transação. </Empty>
+      }
+    </>
 
     return <></>
 }

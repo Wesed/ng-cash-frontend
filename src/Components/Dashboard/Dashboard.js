@@ -76,7 +76,7 @@ const Container = styled.section`
 const InfoMenu = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 0 5rem 0 5rem;
+  padding: 0 5rem 5rem 5rem;
 
   h1 {
     position: relative;
@@ -365,8 +365,7 @@ const Dashboard = () => {
   const [dateStart, setDateStart] = React.useState('');
   const [dateEnd, setDateEnd] = React.useState('');
   const [filterOptions, setFilterOptions] = React.useState('');
-  const {data, dataAcc, error, userLogout, setError, newTransfer} = React.useContext(UserContext);
-
+  const {data, error, userLogout, setError, newTransfer, dataAcc} = React.useContext(UserContext);
 
   // posiciona o filter container
   React.useEffect(() => {
@@ -406,25 +405,29 @@ const Dashboard = () => {
   };
 
   const handleTransfer = () => {
-    // validar valor > 1 e < que o saldo atual 
-    // verificar se o nome do favorito nao e o mesmo do usuario
-    const transferValue = +parseFloat(valueTransfer.value.replace(',', '.')).toFixed(2);
-    const balanceValue = +parseFloat(dataAcc.balance).toFixed(2);
+    setVisible(true);
 
-    if (transferValue>0 && transferValue <= balanceValue) {
-      if(userCredit.value !== data.username) {
-        console.log(userCredit.value, data.username);
-        newTransfer(valueTransfer.value, userCredit.value);
-        setError('');
-      } else {
-        setError('Você não pode fazer uma transferência pra si mesmo.');
-      }
-    } else if(transferValue<=0 ) {
-      setError('Ops, o saldo precisa ser maior que 1.');
-    } 
-      else {
-        setError('Ops, seu saldo é menor que o valor da transação.');
-      }
+    const transferValue = +parseFloat(valueTransfer.value.replace(',', '.')).toFixed(2);
+    // const balanceValue = +parseFloat(dataAcc.balance).toFixed(2);
+    let balanceValue = 0;
+    if (visible) {
+      balanceValue = parseFloat((document.querySelector('#balance').innerHTML).substring(2))
+
+      if (transferValue>0 && transferValue <= balanceValue) {
+        if(userCredit.value !== data.username) {
+          console.log(userCredit.value, data.username);
+          newTransfer(valueTransfer.value, userCredit.value);
+          setError('');
+        } else {
+          setError('Você não pode fazer uma transferência pra si mesmo.');
+        }
+      } else if(transferValue<=0 ) {
+        setError('Ops, o saldo precisa ser maior que 1.');
+      } 
+        else {
+          setError('Ops, seu saldo é menor que o valor da transação.');
+        }
+    }
 
   };
 
@@ -456,7 +459,7 @@ const Dashboard = () => {
             <TransactionContainer>
               <ButtonClose onClick={()=>{setTransferVisibility(false)}}> X </ButtonClose>
               <h2> Nova transferência </h2>
-              <Input value={valueTransfer} placeholder="R$" {...valueTransfer}/>
+              <Input type="number" value={valueTransfer} placeholder="R$" {...valueTransfer}/>
               <div>
                 <Input value={userCredit} className="transferUser" placeholder="Username de origem (quem vai receber)" {...userCredit}/>
               </div>
@@ -475,7 +478,7 @@ const Dashboard = () => {
                 {visible ? <Eye/> : <EyeOff/>}
               </button>
             </div>
-            {visible ? <h3> R${dataAcc.balance}</h3> : <h3> *********</h3>}
+            {visible ? <h3 id="balance"> R${dataAcc.balance}</h3> : <h3> *********</h3>}
           </div>
           <Dollar />
         </Balance>
@@ -514,7 +517,7 @@ const Dashboard = () => {
 
             </FilterContainer>
           </HeaderTable>
-          <Table filter={filterOptions} />
+          <Table visible={visible} filter={filterOptions} />
         </TableTransactions>
 
       </InfoMenu>
