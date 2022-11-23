@@ -37,10 +37,11 @@ const Empty = styled.p`
 `;
 
 const Table = ({visible, filter}) => {
-  const {getTransactions, data, dataAcc, setDataAcc } = React.useContext(UserContext);
+  const {getTransactions, data, dataAcc } = React.useContext(UserContext);
   const [dataTable, setData] = React.useState('')
   const [dataItems, setDataItems] = React.useState([]);
   const [isEmpty, setEmpty] = React.useState(true);
+
 
   React.useEffect(()=>{
 
@@ -74,7 +75,7 @@ const Table = ({visible, filter}) => {
   // mudar a cor p/ entrada e saida
   React.useEffect(() => {
     if (dataTable) {
-      dataTable.length > 0 && setEmpty(false);
+      dataTable.transactions.length > 0 && setEmpty(false);
       let table = document.querySelector("#table").rows;
       if(table.length === 1 ) {
         let tableContainer = document.querySelector("#table");
@@ -137,7 +138,6 @@ const Table = ({visible, filter}) => {
         }
       }
       let balance = +parseFloat(credit - debit).toFixed(2);
-      console.log(credit);
       if (visible) document.querySelector('#balance').innerHTML = `R$${balance}`;
     }
 

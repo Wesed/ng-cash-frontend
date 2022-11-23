@@ -478,7 +478,7 @@ const Dashboard = () => {
                 {visible ? <Eye/> : <EyeOff/>}
               </button>
             </div>
-            {visible ? <h3 id="balance"> R${dataAcc.balance}</h3> : <h3> *********</h3>}
+            {visible ? <h3 id="balance"> 0 </h3> : <h3> *********</h3>}
           </div>
           <Dollar />
         </Balance>
